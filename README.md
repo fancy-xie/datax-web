@@ -1,4 +1,4 @@
-# DataX-Web 个人小优化版，
+# DataX-Web 个人小优化版
 ### 基于2.1.2-release
 
 DataX Web是在DataX之上开发的分布式数据同步工具，提供简单易用的
@@ -6,4 +6,4 @@ DataX Web是在DataX之上开发的分布式数据同步工具，提供简单易
 
 任务"执行器"支持集群部署，支持执行器多节点路由策略选择，支持超时控制、失败重试、失败告警、任务依赖，执行器CPU.内存.负载的监控等等。后续还将提供更多的数据源支持、数据转换UDF、表结构同步、数据同步血缘等更为复杂的业务场景。
 
-原仓库地址：https://github.com/WeiYe-Jing/datax-web
+使用说明请见原仓库地址：https://github.com/WeiYe-Jing/datax-web
