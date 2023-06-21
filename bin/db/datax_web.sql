@@ -206,7 +206,7 @@ CREATE TABLE `job_user`  (
 -- ----------------------------
 -- Records of job_user
 -- ----------------------------
-INSERT INTO `job_user` VALUES (1, 'admin', '$2a$10$2KCqRbra0Yn2TwvkZxtfLuWuUP5KyCWsljO/ci5pLD27pqR3TV1vy', 'ROLE_ADMIN', NULL);
+INSERT INTO `job_user` VALUES (1, 'admin', '$2a$10$RHIGXnCMYweUudm8mnWzn.pRSOpGrKLYEDMKy2v1GSW.TFNDhZgSq', 'ROLE_ADMIN', NULL);
 
 
 
