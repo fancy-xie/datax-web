@@ -82,10 +82,10 @@ public class UserController {
         if (!StringUtils.hasText(jobUser.getPassword())) {
             return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_please_input") + I18nUtil.getString("user_password"));
         }
-        /* jobUser.setPassword(jobUser.getPassword().trim());
-        if (!(jobUser.getPassword().length() >= 4 && jobUser.getPassword().length() <= 20)) {
-            return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_length_limit") + "[4-20]");
-        } */
+//         jobUser.setPassword(jobUser.getPassword().trim());
+//         if (!(jobUser.getPassword().length() >= 4 && jobUser.getPassword().length() <= 20)) {
+//             return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_length_limit") + "[4-20]");
+//         }
         jobUser.setPassword(bCryptPasswordEncoder.encode(jobUser.getPassword()));
 
 
@@ -104,14 +104,14 @@ public class UserController {
     @ApiOperation("更新用户信息")
     public ReturnT<String> update(@RequestBody JobUser jobUser) {
         if (StringUtils.hasText(jobUser.getPassword())) {
-            String pwd = jobUser.getPassword();
+            String pwd = jobUser.getPassword().trim();
             if (StrUtil.isBlank(pwd)) {
                 return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_no_blank") + "密码");
             }
 
-            /* if (!(pwd.length() >= 4 && pwd.length() <= 20)) {
-                return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_length_limit") + "[4-20]");
-            } */
+//            if (!(pwd.length() >= 4 && pwd.length() <= 20)) {
+//                return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_length_limit") + "[4-20]");
+//            }
             jobUser.setPassword(bCryptPasswordEncoder.encode(pwd));
         } else {
             return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_no_blank") + "密码");
@@ -135,10 +135,10 @@ public class UserController {
         if (password == null || password.trim().length() == 0) {
             return new ReturnT<>(ReturnT.FAIL.getCode(), "密码不可为空");
         }
-        /* password = password.trim();
-        if (!(password.length() >= 4 && password.length() <= 20)) {
-            return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_length_limit") + "[4-20]");
-        } */
+//        password = password.trim();
+//        if (!(password.length() >= 4 && password.length() <= 20)) {
+//            return new ReturnT<>(FAIL_CODE, I18nUtil.getString("system_length_limit") + "[4-20]");
+//        }
         // do write
         JobUser existUser = jobUserMapper.loadByUserName(jobUser.getUsername());
         existUser.setPassword(bCryptPasswordEncoder.encode(password));
