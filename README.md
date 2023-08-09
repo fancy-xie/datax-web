@@ -18,4 +18,13 @@ mvn clean install
 - [X] 修改用户密码密文传输
 - [ ] 数据源管理测试连接、提交密文传输
 - [x] 数据源删除二次确认
-- [ ] 一键更改任务管理数据源
+- [x] 一键更改任务管理数据源（MySQL）
+
+#
+#### 一键更改任务管理数据源用法
+如果是jdbc类型的数据源，提交修改后会弹出提示框，点击“确定”即可进入弹窗，替换的数据源会以刚刚修改的数据源为基准。
+
+可以以项目或者任务的维度来选择更新列表。
+
+以MySQL的JSON模板来开发，如果你使用的数据源模板中username、password、jdbc_url跟MySQL模板的节点位置是一样的，那么可以使用，位置不同请不要使用这个功能。
+![dialog](https://github.com/fancy-xie/datax-web/doc/datax-web/batch-update-job-datasource/dialog.png)
