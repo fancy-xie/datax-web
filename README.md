@@ -27,4 +27,5 @@ mvn clean install
 可以以项目或者任务的维度来选择更新列表。
 
 以MySQL的JSON模板来开发，如果你使用的数据源模板中username、password、jdbc_url跟MySQL模板的节点位置是一样的，那么可以使用，位置不同请不要使用这个功能。
-![dialog](https://github.com/fancy-xie/datax-web/doc/datax-web/batch-update-job-datasource/dialog.png)
+
+![dialog](https://github.com/fancy-xie/datax-web/blob/master/doc/datax-web/batch-update-job-datasource/dialog.png?raw=true)
