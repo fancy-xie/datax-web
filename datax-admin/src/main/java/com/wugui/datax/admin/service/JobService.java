@@ -3,6 +3,7 @@ package com.wugui.datax.admin.service;
 
 import com.wugui.datatx.core.biz.model.ReturnT;
 import com.wugui.datax.admin.dto.DataXBatchJsonBuildDto;
+import com.wugui.datax.admin.dto.DataXBatchUpdateJobDatasourceDto;
 import com.wugui.datax.admin.dto.TaskScheduleDto;
 import com.wugui.datax.admin.entity.JobInfo;
 
@@ -46,7 +47,7 @@ public interface JobService {
      * @param jobInfo
      * @return
      */
-    ReturnT<String> update(JobInfo jobInfo);
+    ReturnT<String> update(JobInfo jobInfo) throws IOException ;
 
     /**
      * remove job
@@ -93,4 +94,11 @@ public interface JobService {
      * @return
      */
     ReturnT<String> batchAdd(DataXBatchJsonBuildDto dto) throws IOException;
+
+
+    /**
+     * 批量更新任务数据源
+     * @return
+     */
+    ReturnT<String> batchUpdateJobDatasource(DataXBatchUpdateJobDatasourceDto dto) throws IOException;
 }

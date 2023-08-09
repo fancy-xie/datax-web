@@ -3,6 +3,7 @@ package com.wugui.datax.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wugui.datax.admin.entity.JobDatasource;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * jdbc数据源配置表数据库访问层
@@ -15,4 +16,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface JobDatasourceMapper extends BaseMapper<JobDatasource> {
     int update(JobDatasource datasource);
 
+    JobDatasource loadById(@Param("id") int id);
 }

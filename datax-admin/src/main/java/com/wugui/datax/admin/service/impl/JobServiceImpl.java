@@ -1,5 +1,8 @@
 package com.wugui.datax.admin.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
 import com.wugui.datatx.core.biz.model.ReturnT;
 import com.wugui.datatx.core.enums.ExecutorBlockStrategyEnum;
 import com.wugui.datatx.core.glue.GlueTypeEnum;
@@ -9,20 +12,20 @@ import com.wugui.datax.admin.core.route.ExecutorRouteStrategyEnum;
 import com.wugui.datax.admin.core.thread.JobScheduleHelper;
 import com.wugui.datax.admin.core.util.I18nUtil;
 import com.wugui.datax.admin.dto.DataXBatchJsonBuildDto;
+import com.wugui.datax.admin.dto.DataXBatchUpdateJobDatasourceDto;
 import com.wugui.datax.admin.dto.DataXJsonBuildDto;
-import com.wugui.datax.admin.entity.JobGroup;
-import com.wugui.datax.admin.entity.JobInfo;
-import com.wugui.datax.admin.entity.JobLogReport;
-import com.wugui.datax.admin.entity.JobTemplate;
+import com.wugui.datax.admin.entity.*;
 import com.wugui.datax.admin.mapper.*;
 import com.wugui.datax.admin.service.DatasourceQueryService;
 import com.wugui.datax.admin.service.DataxJsonService;
+import com.wugui.datax.admin.service.JobDatasourceService;
 import com.wugui.datax.admin.service.JobService;
 import com.wugui.datax.admin.util.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -56,6 +59,8 @@ public class JobServiceImpl implements JobService {
     private JobTemplateMapper jobTemplateMapper;
     @Resource
     private DataxJsonService dataxJsonService;
+    @Resource
+    private JobDatasourceMapper jobDatasourceMapper;
 
     @Override
     public Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String glueType, int userId, Integer[] projectIds) {
@@ -92,7 +97,7 @@ public class JobServiceImpl implements JobService {
         if (jobInfo.getJobDesc() == null || jobInfo.getJobDesc().trim().length() == 0) {
             return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("system_please_input") + I18nUtil.getString("jobinfo_field_jobdesc")));
         }
-        if (jobInfo.getUserId() == 0 ) {
+        if (jobInfo.getUserId() == 0) {
             return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("system_please_input") + I18nUtil.getString("jobinfo_field_author")));
         }
         if (ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null) == null) {
@@ -167,7 +172,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public ReturnT<String> update(JobInfo jobInfo) {
+    public ReturnT<String> update(JobInfo jobInfo) throws IOException  {
 
         // valid
         if (!CronExpression.isValidExpression(jobInfo.getJobCron())) {
@@ -457,6 +462,47 @@ public class JobServiceImpl implements JobService {
             jobInfo.setUpdateTime(new Date());
             jobInfo.setGlueUpdatetime(new Date());
             jobInfoMapper.save(jobInfo);
+        }
+        return ReturnT.SUCCESS;
+    }
+
+    @Override
+    public ReturnT<String> batchUpdateJobDatasource(DataXBatchUpdateJobDatasourceDto dto) throws IOException {
+        List<JobInfo> jobInfoList = null;
+        if (dto.getBatchUpdateJobOptionType() == 0) { // 项目
+            jobInfoList = jobInfoMapper.loadByProjectIds(dto.getBatchUpdateJobList());
+        } else if (dto.getBatchUpdateJobOptionType() == 1) { // 任务
+            jobInfoList = jobInfoMapper.loadByIds(dto.getBatchUpdateJobList());
+        } else {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateJobOptionType") + I18nUtil.getString("system_invalid"));
+        }
+
+        JobDatasource jobDatasource = jobDatasourceMapper.loadById(dto.getDatasourceId());
+        ArrayList<String> JdbcUrlArray = new ArrayList<>();
+        JdbcUrlArray.add(jobDatasource.getJdbcUrl());
+
+        boolean isReader = true;
+        if (dto.getBatchUpdateJobDatasourceType() == 0) {
+            isReader = true;
+        } else if (dto.getBatchUpdateJobDatasourceType() == 1) {
+            isReader = false;
+        } else {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateDataSourceType") + I18nUtil.getString("system_invalid"));
+        }
+        for (JobInfo jobInfo : jobInfoList) {
+            JSONObject jsonObject = JSON.parseObject(jobInfo.getJobJson(), Feature.OrderedField); // 使用Feature.OrderedField保持原字段顺序
+            jsonObject.getJSONObject("job")
+                    .getJSONArray("content")
+                    .getJSONObject(0)
+                    .getJSONObject(isReader ? "reader" : "writer")
+                    .getJSONObject("parameter")
+                    .fluentPut("username", jobDatasource.getJdbcUsername())
+                    .fluentPut("password", jobDatasource.getJdbcPassword())
+                    .getJSONArray("connection")
+                    .getJSONObject(0)
+                    .fluentPut("jdbcUrl", isReader ? JdbcUrlArray : jobDatasource.getJdbcUrl());
+            jobInfo.setJobJson(jsonObject.toJSONString());
+            update(jobInfo);
         }
         return ReturnT.SUCCESS;
     }

@@ -313,6 +313,24 @@
 		LIMIT #{pagesize}
 	</select>
 
+	<select id="loadByProjectIds" parameterType="java.util.List" resultMap="JobInfo">
+		SELECT <include refid="Base_Column_List" />
+		FROM job_info AS t
+		WHERE t.project_id IN
+		<foreach collection="projectIds" item="projectId" index="index" open="(" close=")" separator=",">
+			#{projectId}
+		</foreach>
+	</select>
+
+	<select id="loadByIds" parameterType="java.util.List" resultMap="JobInfo">
+		SELECT <include refid="Base_Column_List" />
+		FROM job_info AS t
+		WHERE t.id IN
+		<foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</select>
+
 	<update id="scheduleUpdate" parameterType="com.wugui.datax.admin.entity.JobInfo"  >
 		UPDATE job_info
 		SET

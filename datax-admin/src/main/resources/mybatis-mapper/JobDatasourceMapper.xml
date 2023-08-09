@@ -2,6 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wugui.datax.admin.mapper.JobDatasourceMapper">
 
+    <sql id="Base_Column_List">
+        t.id,
+		t.datasource_name,
+		t.datasource,
+		t.datasource_group,
+		t.database_name,
+		t.jdbc_username,
+		t.jdbc_password,
+		t.jdbc_url,
+		t.jdbc_driver_class,
+		t.zk_adress,
+		t.status,
+		t.create_by,
+		t.create_date,
+		t.update_by,
+		t.update_date,
+		t.comments
+    </sql>
+
     <update id="update" parameterType="com.wugui.datax.admin.entity.JobDatasource">
         UPDATE job_jdbc_datasource
         <set>
@@ -18,4 +37,10 @@
         WHERE id = #{id}
     </update>
 
+    <select id="loadById" parameterType="java.util.HashMap" resultType="com.wugui.datax.admin.entity.JobDatasource">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM job_jdbc_datasource AS t
+        WHERE t.id = #{id}
+    </select>
 </mapper>

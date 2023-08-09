@@ -8,6 +8,7 @@ import com.wugui.datax.admin.core.thread.JobTriggerPoolHelper;
 import com.wugui.datax.admin.core.trigger.TriggerTypeEnum;
 import com.wugui.datax.admin.core.util.I18nUtil;
 import com.wugui.datax.admin.dto.DataXBatchJsonBuildDto;
+import com.wugui.datax.admin.dto.DataXBatchUpdateJobDatasourceDto;
 import com.wugui.datax.admin.dto.TriggerJobDto;
 import com.wugui.datax.admin.entity.JobInfo;
 import com.wugui.datax.admin.service.JobService;
@@ -62,7 +63,7 @@ public class JobInfoController extends BaseController{
 
     @PostMapping("/update")
     @ApiOperation("更新任务")
-    public ReturnT<String> update(HttpServletRequest request,@RequestBody JobInfo jobInfo) {
+    public ReturnT<String> update(HttpServletRequest request,@RequestBody JobInfo jobInfo) throws IOException {
         jobInfo.setUserId(getCurrentUserId(request));
         return jobService.update(jobInfo);
     }
@@ -125,5 +126,23 @@ public class JobInfoController extends BaseController{
             return new ReturnT<>(ReturnT.FAIL_CODE, (I18nUtil.getString("system_please_choose") + I18nUtil.getString("jobinfo_field_temp")));
         }
         return jobService.batchAdd(dto);
+    }
+
+    @PostMapping("/batchUpdateDatasource")
+    @ApiOperation("批量创建任务")
+    public ReturnT<String> batchUpdateDatasource(@RequestBody DataXBatchUpdateJobDatasourceDto dto) throws IOException {
+        if (dto.getDatasourceId() == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateDataSource") + I18nUtil.getString("system_no_blank"));
+        }
+        if (dto.getBatchUpdateJobDatasourceType() == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateDataSourceType") + I18nUtil.getString("system_no_blank"));
+        }
+        if (dto.getBatchUpdateJobOptionType() == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateJobOptionType") + I18nUtil.getString("system_no_blank"));
+        }
+        if (dto.getBatchUpdateJobList() == null || dto.getBatchUpdateJobList().isEmpty()) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateJobList") + I18nUtil.getString("system_no_blank"));
+        }
+        return jobService.batchUpdateJobDatasource(dto);
     }
 }
