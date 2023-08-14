@@ -6,6 +6,7 @@ import com.wugui.datax.admin.filter.JWTAuthenticationFilter;
 import com.wugui.datax.admin.filter.JWTAuthorizationFilter;
 import com.wugui.datax.admin.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -26,14 +27,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${swagger.enabled:false}")
+    private Boolean enabled;
+
     @Autowired
     private UserDetailsService userDetailsService;
 
     @Bean
-    UserDetailsService customUserService(){ //注册UserDetailsService 的bean
+    UserDetailsService customUserService() { //注册UserDetailsService 的bean
         return new UserDetailsServiceImpl();
     }
-
 
 
     @Bean
@@ -50,9 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/static/**","/index.html","/favicon.ico","/avatar.jpg").permitAll()
-                .antMatchers("/api/callback","/api/processCallback","/api/registry","/api/registryRemove").permitAll()
-                .antMatchers("/doc.html","/swagger-resources/**","/webjars/**","/*/api-docs").anonymous()
+                .antMatchers("/static/**", "/index.html", "/favicon.ico", "/avatar.jpg").permitAll()
+                .antMatchers("/api/callback", "/api/processCallback", "/api/registry", "/api/registryRemove").permitAll()
+                .antMatchers(enabled ? "/doc.html" : "lWiN", enabled ? "/swagger-resources/**" : "aoBA", enabled ? "/webjars/**" : "gVGw", enabled ? "/*/api-docs" : "uQfh").anonymous()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))

@@ -19,6 +19,7 @@ mvn clean install
 - [ ] 数据源管理测试连接、提交密文传输
 - [x] 数据源删除二次确认
 - [x] 一键更改任务管理数据源（MySQL）
+- [x] 通过配置禁用swagger（默认禁用，启用则配置swagger.enabled=true）
 
 #
 #### 一键更改任务管理数据源用法

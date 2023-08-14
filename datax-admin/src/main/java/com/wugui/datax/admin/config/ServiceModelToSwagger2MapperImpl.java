@@ -5,6 +5,7 @@ import io.swagger.models.*;
 import io.swagger.models.parameters.Parameter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Primary;
@@ -26,6 +27,7 @@ import static com.google.common.collect.Maps.newTreeMap;
 @Component(value = "ServiceModelToSwagger2Mapper")
 @Primary
 @ConditionalOnWebApplication
+@ConditionalOnProperty(name = "swagger.enabled", havingValue = "true")
 public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapper {
 
 

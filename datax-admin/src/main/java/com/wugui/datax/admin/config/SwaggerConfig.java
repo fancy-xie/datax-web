@@ -1,6 +1,8 @@
 package com.wugui.datax.admin.config;
 
 import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +22,15 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 @EnableSwaggerBootstrapUI
-@ConditionalOnWebApplication
+@ConditionalOnProperty(name = "swagger.enabled", havingValue = "true")
 public class SwaggerConfig implements WebMvcConfigurer {
+
+    @Value("${swagger.enabled:false}")
+    private Boolean enabled;
 
     @Bean
     public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
+        return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).enable(enabled).select()
                 .apis(RequestHandlerSelectors.basePackage("com.wugui.datax.admin.controller")).paths(PathSelectors.any())
                 .build();
     }
