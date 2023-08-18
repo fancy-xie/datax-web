@@ -3,6 +3,7 @@ package com.wugui.datax.admin.controller;
 import com.wugui.datatx.core.biz.ExecutorBiz;
 import com.wugui.datatx.core.biz.model.LogResult;
 import com.wugui.datatx.core.biz.model.ReturnT;
+import com.wugui.datatx.core.glue.GlueTypeEnum;
 import com.wugui.datatx.core.util.DateUtil;
 import com.wugui.datax.admin.core.kill.KillJob;
 import com.wugui.datax.admin.core.scheduler.JobScheduler;
@@ -18,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jingwk on 2019/11/17
@@ -50,7 +48,7 @@ public class JobLogController {
         // parse param
         Date triggerTimeStart = null;
         Date triggerTimeEnd = null;
-        if (filterTime != null && filterTime.trim().length() > 0) {
+        if (filterTime != null && !filterTime.trim().isEmpty()) {
             String[] temp = filterTime.split(" - ");
             if (temp.length == 2) {
                 triggerTimeStart = DateUtil.parseDateTime(temp[0]);
@@ -94,7 +92,7 @@ public class JobLogController {
 
     @RequestMapping(value = "/logKill", method = RequestMethod.POST)
     @ApiOperation("kill任务")
-    public ReturnT<String> logKill(int id) {
+    public ReturnT<String> logKill(long id) {
         // base check
         JobLog log = jobLogMapper.load(id);
         JobInfo jobInfo = jobInfoMapper.loadById(log.getJobId());
@@ -157,10 +155,10 @@ public class JobLogController {
         List<Long> logIds;
         do {
             logIds = jobLogMapper.findClearLogIds(jobGroup, jobId, clearBeforeTime, clearBeforeNum, 1000);
-            if (logIds != null && logIds.size() > 0) {
+            if (logIds != null && !logIds.isEmpty()) {
                 jobLogMapper.clearLog(logIds);
             }
-        } while (logIds != null && logIds.size() > 0);
+        } while (logIds != null && !logIds.isEmpty());
 
         return ReturnT.SUCCESS;
     }
@@ -168,6 +166,11 @@ public class JobLogController {
     @ApiOperation("停止该job作业")
     @PostMapping("/killJob")
     public ReturnT<String> killJob(@RequestBody JobLog log) {
-        return KillJob.trigger(log.getId(), log.getTriggerTime(), log.getExecutorAddress(), log.getProcessId());
+        JobInfo jobInfo = jobInfoMapper.loadById(log.getJobId());
+        if (GlueTypeEnum.match(jobInfo.getGlueType()) == GlueTypeEnum.DATAX || Objects.requireNonNull(GlueTypeEnum.match(jobInfo.getGlueType())).isScript()) {
+            return KillJob.trigger(log.getId(), log.getTriggerTime(), log.getExecutorAddress(), log.getProcessId());
+        } else {
+            return this.logKill(log.getId());
+        }
     }
 }
