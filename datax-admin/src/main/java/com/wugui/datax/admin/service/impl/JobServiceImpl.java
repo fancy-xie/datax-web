@@ -12,20 +12,18 @@ import com.wugui.datax.admin.core.route.ExecutorRouteStrategyEnum;
 import com.wugui.datax.admin.core.thread.JobScheduleHelper;
 import com.wugui.datax.admin.core.util.I18nUtil;
 import com.wugui.datax.admin.dto.DataXBatchJsonBuildDto;
-import com.wugui.datax.admin.dto.DataXBatchUpdateJobDatasourceDto;
+import com.wugui.datatx.core.biz.model.DataXBatchUpdateJobDatasourceDto;
 import com.wugui.datax.admin.dto.DataXJsonBuildDto;
 import com.wugui.datax.admin.entity.*;
 import com.wugui.datax.admin.mapper.*;
 import com.wugui.datax.admin.service.DatasourceQueryService;
 import com.wugui.datax.admin.service.DataxJsonService;
-import com.wugui.datax.admin.service.JobDatasourceService;
 import com.wugui.datax.admin.service.JobService;
 import com.wugui.datax.admin.util.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -174,7 +172,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public ReturnT<String> update(JobInfo jobInfo) throws IOException  {
+    public ReturnT<String> update(JobInfo jobInfo) throws IOException {
 
         // valid
         if (!CronExpression.isValidExpression(jobInfo.getJobCron())) {
@@ -491,20 +489,26 @@ public class JobServiceImpl implements JobService {
         } else {
             return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateDataSourceType") + I18nUtil.getString("system_invalid"));
         }
-        for (JobInfo jobInfo : jobInfoList) {
-            JSONObject jsonObject = JSON.parseObject(jobInfo.getJobJson(), Feature.OrderedField); // 使用Feature.OrderedField保持原字段顺序
-            jsonObject.getJSONObject("job")
-                    .getJSONArray("content")
-                    .getJSONObject(0)
-                    .getJSONObject(isReader ? "reader" : "writer")
-                    .getJSONObject("parameter")
-                    .fluentPut("username", jobDatasource.getJdbcUsername())
-                    .fluentPut("password", jobDatasource.getJdbcPassword())
-                    .getJSONArray("connection")
-                    .getJSONObject(0)
-                    .fluentPut("jdbcUrl", isReader ? JdbcUrlArray : jobDatasource.getJdbcUrl());
-            jobInfo.setJobJson(jsonObject.toJSONString());
-            update(jobInfo);
+        try {
+            for (JobInfo jobInfo : jobInfoList) {
+                JSONObject jsonObject = JSON.parseObject(jobInfo.getJobJson(), Feature.OrderedField); // 使用Feature.OrderedField保持原字段顺序
+                JSONObject job = jsonObject.getJSONObject("job");
+                if (job != null) {
+                    job.getJSONArray("content")
+                            .getJSONObject(0)
+                            .getJSONObject(isReader ? "reader" : "writer")
+                            .getJSONObject("parameter")
+                            .fluentPut("username", jobDatasource.getJdbcUsername())
+                            .fluentPut("password", jobDatasource.getJdbcPassword())
+                            .getJSONArray("connection")
+                            .getJSONObject(0)
+                            .fluentPut("jdbcUrl", isReader ? JdbcUrlArray : jobDatasource.getJdbcUrl());
+                    jobInfo.setJobJson(jsonObject.toJSONString());
+                    update(jobInfo);
+                }
+            }
+        } catch (Exception e) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, e.getMessage());
         }
         return ReturnT.SUCCESS;
     }

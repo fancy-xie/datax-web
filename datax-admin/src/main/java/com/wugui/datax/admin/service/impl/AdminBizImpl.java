@@ -1,10 +1,7 @@
 package com.wugui.datax.admin.service.impl;
 
 import com.wugui.datatx.core.biz.AdminBiz;
-import com.wugui.datatx.core.biz.model.HandleCallbackParam;
-import com.wugui.datatx.core.biz.model.HandleProcessCallbackParam;
-import com.wugui.datatx.core.biz.model.RegistryParam;
-import com.wugui.datatx.core.biz.model.ReturnT;
+import com.wugui.datatx.core.biz.model.*;
 import com.wugui.datatx.core.enums.IncrementTypeEnum;
 import com.wugui.datatx.core.handler.IJobHandler;
 import com.wugui.datax.admin.core.kill.KillJob;
@@ -16,12 +13,14 @@ import com.wugui.datax.admin.entity.JobLog;
 import com.wugui.datax.admin.mapper.JobInfoMapper;
 import com.wugui.datax.admin.mapper.JobLogMapper;
 import com.wugui.datax.admin.mapper.JobRegistryMapper;
+import com.wugui.datax.admin.service.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +38,9 @@ public class AdminBizImpl implements AdminBiz {
     private JobInfoMapper jobInfoMapper;
     @Resource
     private JobRegistryMapper jobRegistryMapper;
+
+    @Resource
+    private JobService jobService;
 
     @Override
     public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
@@ -204,6 +206,11 @@ public class AdminBizImpl implements AdminBiz {
             freshGroupRegistryInfo(registryParam);
         }
         return ReturnT.SUCCESS;
+    }
+
+    @Override
+    public ReturnT<String> batchUpdateJobDatasource(DataXBatchUpdateJobDatasourceDto dto) throws IOException {
+        return jobService.batchUpdateJobDatasource(dto);
     }
 
     private void freshGroupRegistryInfo(RegistryParam registryParam) {

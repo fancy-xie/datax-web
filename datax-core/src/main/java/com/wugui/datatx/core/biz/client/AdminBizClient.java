@@ -1,10 +1,7 @@
 package com.wugui.datatx.core.biz.client;
 
 import com.wugui.datatx.core.biz.AdminBiz;
-import com.wugui.datatx.core.biz.model.HandleCallbackParam;
-import com.wugui.datatx.core.biz.model.HandleProcessCallbackParam;
-import com.wugui.datatx.core.biz.model.RegistryParam;
-import com.wugui.datatx.core.biz.model.ReturnT;
+import com.wugui.datatx.core.biz.model.*;
 import com.wugui.datatx.core.util.JobRemotingUtil;
 
 import java.util.List;
@@ -50,5 +47,10 @@ public class AdminBizClient implements AdminBiz {
     @Override
     public ReturnT<String> registryRemove(RegistryParam registryParam) {
         return JobRemotingUtil.postBody(addressUrl + "api/registryRemove", accessToken, registryParam, 3);
+    }
+
+    @Override
+    public ReturnT<String> batchUpdateJobDatasource(DataXBatchUpdateJobDatasourceDto dto) {
+        return JobRemotingUtil.postBody(addressUrl + "api/batchUpdateDatasourceRpc", accessToken, dto, 10);
     }
 }

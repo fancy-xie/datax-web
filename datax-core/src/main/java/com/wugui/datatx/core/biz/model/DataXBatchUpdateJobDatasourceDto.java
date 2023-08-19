@@ -1,4 +1,4 @@
-package com.wugui.datax.admin.dto;
+package com.wugui.datatx.core.biz.model;
 
 import lombok.Data;
 

@@ -3,7 +3,7 @@ package com.wugui.datax.admin.service;
 
 import com.wugui.datatx.core.biz.model.ReturnT;
 import com.wugui.datax.admin.dto.DataXBatchJsonBuildDto;
-import com.wugui.datax.admin.dto.DataXBatchUpdateJobDatasourceDto;
+import com.wugui.datatx.core.biz.model.DataXBatchUpdateJobDatasourceDto;
 import com.wugui.datax.admin.dto.TaskScheduleDto;
 import com.wugui.datax.admin.entity.JobInfo;
 
@@ -29,7 +29,7 @@ public interface JobService {
      * @param userId
      * @return
      */
-    Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String glueType, int userId,Integer[] projectIds);
+    Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String glueType, int userId, Integer[] projectIds);
 
     List<JobInfo> list();
 
@@ -47,7 +47,7 @@ public interface JobService {
      * @param jobInfo
      * @return
      */
-    ReturnT<String> update(JobInfo jobInfo) throws IOException ;
+    ReturnT<String> update(JobInfo jobInfo) throws IOException;
 
     /**
      * remove job
@@ -90,6 +90,7 @@ public interface JobService {
 
     /**
      * batch add
+     *
      * @param dto
      * @return
      */
@@ -98,6 +99,7 @@ public interface JobService {
 
     /**
      * 批量更新任务数据源
+     *
      * @return
      */
     ReturnT<String> batchUpdateJobDatasource(DataXBatchUpdateJobDatasourceDto dto) throws IOException;

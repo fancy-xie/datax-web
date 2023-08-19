@@ -1,10 +1,8 @@
 package com.wugui.datatx.core.biz;
 
-import com.wugui.datatx.core.biz.model.HandleCallbackParam;
-import com.wugui.datatx.core.biz.model.HandleProcessCallbackParam;
-import com.wugui.datatx.core.biz.model.RegistryParam;
-import com.wugui.datatx.core.biz.model.ReturnT;
+import com.wugui.datatx.core.biz.model.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -49,4 +47,11 @@ public interface AdminBiz {
      */
     ReturnT<String> registryRemove(RegistryParam registryParam);
 
+    /**
+     * batch update job datasource
+     *
+     * @param dto
+     * @return
+     */
+    ReturnT<String> batchUpdateJobDatasource(DataXBatchUpdateJobDatasourceDto dto) throws IOException;
 }

@@ -1,12 +1,10 @@
 package com.wugui.datax.admin.controller;
 
 import com.wugui.datatx.core.biz.AdminBiz;
-import com.wugui.datatx.core.biz.model.HandleCallbackParam;
-import com.wugui.datatx.core.biz.model.HandleProcessCallbackParam;
-import com.wugui.datatx.core.biz.model.RegistryParam;
-import com.wugui.datatx.core.biz.model.ReturnT;
+import com.wugui.datatx.core.biz.model.*;
 import com.wugui.datatx.core.util.JobRemotingUtil;
 import com.wugui.datax.admin.core.conf.JobAdminConfig;
+import com.wugui.datax.admin.core.util.I18nUtil;
 import com.wugui.datax.admin.core.util.JacksonUtil;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ public class JobApiController {
     public ReturnT<String> callback(HttpServletRequest request, @RequestBody(required = false) String data) {
         // valid
         if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
-                && JobAdminConfig.getAdminConfig().getAccessToken().trim().length()>0
+                && !JobAdminConfig.getAdminConfig().getAccessToken().trim().isEmpty()
                 && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
             return new ReturnT<>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
@@ -46,7 +45,7 @@ public class JobApiController {
         try {
             callbackParamList = JacksonUtil.readValue(data, List.class, HandleCallbackParam.class);
         } catch (Exception e) { }
-        if (callbackParamList==null || callbackParamList.size()==0) {
+        if (callbackParamList==null || callbackParamList.isEmpty()) {
             return new ReturnT<>(ReturnT.FAIL_CODE, "The request data invalid.");
         }
 
@@ -64,7 +63,7 @@ public class JobApiController {
     public ReturnT<String> processCallback(HttpServletRequest request, @RequestBody(required = false) String data) {
         // valid
         if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
-                && JobAdminConfig.getAdminConfig().getAccessToken().trim().length()>0
+                && !JobAdminConfig.getAdminConfig().getAccessToken().trim().isEmpty()
                 && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
             return new ReturnT<>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
@@ -74,7 +73,7 @@ public class JobApiController {
         try {
             callbackParamList = JacksonUtil.readValue(data, List.class, HandleProcessCallbackParam.class);
         } catch (Exception e) { }
-        if (callbackParamList==null || callbackParamList.size()==0) {
+        if (callbackParamList==null || callbackParamList.isEmpty()) {
             return new ReturnT<>(ReturnT.FAIL_CODE, "The request data invalid.");
         }
 
@@ -94,7 +93,7 @@ public class JobApiController {
     public ReturnT<String> registry(HttpServletRequest request, @RequestBody(required = false) String data) {
         // valid
         if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
-                && JobAdminConfig.getAdminConfig().getAccessToken().trim().length()>0
+                && !JobAdminConfig.getAdminConfig().getAccessToken().trim().isEmpty()
                 && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
@@ -122,7 +121,7 @@ public class JobApiController {
     public ReturnT<String> registryRemove(HttpServletRequest request, @RequestBody(required = false) String data) {
         // valid
         if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
-                && JobAdminConfig.getAdminConfig().getAccessToken().trim().length()>0
+                && !JobAdminConfig.getAdminConfig().getAccessToken().trim().isEmpty()
                 && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
             return new ReturnT<>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
@@ -140,5 +139,25 @@ public class JobApiController {
         return adminBiz.registryRemove(registryParam);
     }
 
-
+    @RequestMapping("/batchUpdateDatasourceRpc")
+    private ReturnT<String> batchUpdateDatasourceRpc(HttpServletRequest request, @RequestBody DataXBatchUpdateJobDatasourceDto dto) throws IOException {
+        if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
+                && !JobAdminConfig.getAdminConfig().getAccessToken().trim().isEmpty()
+                && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, "The access token is wrong.");
+        }
+        if (dto.getDatasourceId() == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateDataSource") + I18nUtil.getString("system_no_blank"));
+        }
+        if (dto.getBatchUpdateJobDatasourceType() == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateDataSourceType") + I18nUtil.getString("system_no_blank"));
+        }
+        if (dto.getBatchUpdateJobOptionType() == null) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateJobOptionType") + I18nUtil.getString("system_no_blank"));
+        }
+        if (dto.getBatchUpdateJobList() == null || dto.getBatchUpdateJobList().isEmpty()) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobinfo_field_batchUpdateJobList") + I18nUtil.getString("system_no_blank"));
+        }
+        return adminBiz.batchUpdateJobDatasource(dto);
+    }
 }
